@@ -1305,8 +1305,10 @@ function goBackFromResult() {
   const session = DB.Session.get();
   if (!session) { showPage('landing'); return; }
   if (session.user.role === 'admin') {
+    showPage('admin-dashboard');   // ← must show the page first
     loadAdminSection('view-results');
   } else {
+    showPage('student-dashboard'); // ← must show the page first
     loadStudentSection('stu-results');
   }
 }
