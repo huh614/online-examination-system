@@ -1,0 +1,1297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ExamPortal Pro – Online Examination System</title>
+  <meta name="description" content="A full-featured online examination system for DBMS projects. Manage students, subjects, questions, and exams with real-time results." />
+  <link rel="stylesheet" href="styles.css" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎓</text></svg>" />
+</head>
+<body>
+
+<!-- ============================
+     TOAST CONTAINER
+     ============================ -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- ============================
+     PAGE: LANDING
+     ============================ -->
+<div id="page-landing" class="page active">
+  <div class="landing-bg"></div>
+
+  <!-- Navbar -->
+  <nav class="navbar">
+    <a class="navbar-brand" href="#">
+      <div class="navbar-logo">🎓</div>
+      <span class="navbar-title">ExamPortal Pro</span>
+    </a>
+    <div class="navbar-actions">
+      <button id="btn-login-nav" class="btn btn-outline">Login</button>
+      <button id="btn-register-nav" class="btn btn-primary">Get Started</button>
+    </div>
+  </nav>
+
+  <!-- Hero -->
+  <section class="landing-hero">
+    <div class="hero-badge">
+      🚀 DBMS Project — Online Examination System
+    </div>
+    <h1 class="hero-title">
+      Smart Exams,<br/>
+      <span class="gradient-text">Smarter Results</span>
+    </h1>
+    <p class="hero-subtitle">
+      A powerful, real-time online examination platform with admin controls, student dashboards, auto-grading, and detailed analytics — built for modern education.
+    </p>
+    <div class="hero-actions">
+      <button id="btn-get-started" class="btn btn-primary btn-lg">
+        🚀 Start Exam Now
+      </button>
+      <button class="btn btn-secondary btn-lg" onclick="document.querySelector('.features-section').scrollIntoView({behavior:'smooth'})">
+        📖 Learn More
+      </button>
+    </div>
+    <div class="hero-stats">
+      <div class="stat-item">
+        <div class="stat-number" id="hero-stat-students">3+</div>
+        <div class="stat-label">Students Enrolled</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">3</div>
+        <div class="stat-label">Active Exams</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">20+</div>
+        <div class="stat-label">Questions Bank</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-number">100%</div>
+        <div class="stat-label">Auto-Graded</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="features-section">
+    <div class="section-heading">
+      <div class="section-tag">Everything You Need</div>
+      <h2 class="section-title">Packed with Powerful Features</h2>
+      <p class="section-subtitle">From question management to real-time results—ExamPortal Pro covers it all.</p>
+    </div>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="feature-icon purple">🛡️</div>
+        <h3 class="feature-title">Role-Based Access</h3>
+        <p class="feature-desc">Separate login portals for Admins and Students with secure session-based authentication.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon cyan">📝</div>
+        <h3 class="feature-title">Question Bank</h3>
+        <p class="feature-desc">Create and manage questions by subject with difficulty levels (Easy/Medium/Hard) and auto-selection for exams.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon green">⏱️</div>
+        <h3 class="feature-title">Live Exam Timer</h3>
+        <p class="feature-desc">Real-time countdown with visual warnings and automatic submission when time expires.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon amber">📊</div>
+        <h3 class="feature-title">Instant Analytics</h3>
+        <p class="feature-desc">Detailed results with grade (A+/A/B/C/D/F), percentage, correct/wrong counts, and time taken.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon pink">🎯</div>
+        <h3 class="feature-title">Question Palette</h3>
+        <p class="feature-desc">Visual question navigator showing answered, unanswered, and current question status at a glance.</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon red">🔍</div>
+        <h3 class="feature-title">Answer Review</h3>
+        <p class="feature-desc">After submission, see every question with correct answers highlighted and wrong answers marked.</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Role Cards -->
+  <section style="padding:0 40px 100px;max-width:1200px;margin:0 auto">
+    <div class="grad-border-card" style="max-width:800px;margin:0 auto">
+      <div class="grad-border-card-inner">
+        <div style="text-align:center;margin-bottom:32px">
+          <h2 style="font-family:'Outfit',sans-serif;font-size:32px;font-weight:700;margin-bottom:8px">Quick Access</h2>
+          <p style="color:var(--text-secondary)">Pre-loaded demo credentials to explore the system</p>
+        </div>
+        <div class="grid-2">
+          <div style="background:rgba(108,99,255,0.08);border:1px solid rgba(108,99,255,0.2);border-radius:var(--radius);padding:24px">
+            <div style="font-size:40px;margin-bottom:12px">👨‍💼</div>
+            <h3 style="font-size:18px;font-weight:700;margin-bottom:16px;color:var(--primary-light)">Admin Access</h3>
+            <div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.8">
+              <span style="display:block">👤 Username: <code style="color:var(--text-primary)">admin</code></span>
+              <span style="display:block">🔒 Password: <code style="color:var(--text-primary)">admin123</code></span>
+            </div>
+            <button class="btn btn-primary btn-full" onclick="quickLogin('admin','admin123','admin')">Login as Admin</button>
+          </div>
+          <div style="background:rgba(6,182,212,0.08);border:1px solid rgba(6,182,212,0.2);border-radius:var(--radius);padding:24px">
+            <div style="font-size:40px;margin-bottom:12px">👩‍🎓</div>
+            <h3 style="font-size:18px;font-weight:700;margin-bottom:16px;color:var(--secondary)">Student Access</h3>
+            <div style="font-size:13px;color:var(--text-secondary);margin-bottom:16px;line-height:1.8">
+              <span style="display:block">👤 Username: <code style="color:var(--text-primary)">alice</code></span>
+              <span style="display:block">🔒 Password: <code style="color:var(--text-primary)">alice123</code></span>
+            </div>
+            <button class="btn btn-success btn-full" onclick="quickLogin('alice','alice123','student')">Login as Student</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer style="border-top:1px solid var(--border);padding:32px 40px;text-align:center;color:var(--text-muted);font-size:13px">
+    <p>🎓 ExamPortal Pro — Built for DBMS Project &nbsp;|&nbsp; ER Schema: Student ⟷ Exam ⟷ Subject ⟷ Question ⟷ Result</p>
+  </footer>
+</div>
+
+<!-- ============================
+     PAGE: LOGIN
+     ============================ -->
+<div id="page-login" class="page">
+  <div class="auth-background"></div>
+  <div class="auth-container">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-logo-icon">🎓</div>
+        <h1 class="auth-title">Welcome Back</h1>
+        <p class="auth-subtitle">Sign in to your account</p>
+      </div>
+
+      <div class="role-selector">
+        <button class="role-btn" data-role="student" id="login-role-student">
+          <span class="role-icon">👩‍🎓</span> Student
+        </button>
+        <button class="role-btn" data-role="admin" id="login-role-admin">
+          <span class="role-icon">👨‍💼</span> Admin
+        </button>
+      </div>
+
+      <form id="login-form">
+        <div class="form-group">
+          <label class="form-label">Username</label>
+          <div class="input-group">
+            <span class="input-icon">👤</span>
+            <input type="text" id="login-username" class="form-control" placeholder="Enter your username" autocomplete="username" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div class="input-group">
+            <span class="input-icon">🔒</span>
+            <input type="password" id="login-password" class="form-control" placeholder="Enter your password" autocomplete="current-password" required />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full btn-lg" style="margin-top:8px">
+          Sign In →
+        </button>
+      </form>
+
+      <div class="auth-divider"><span class="auth-divider-text">New here?</span></div>
+      <button id="btn-go-register" class="btn btn-secondary btn-full">Create an Account</button>
+
+      <div class="auth-link">
+        <a id="btn-back-login">← Back to Home</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     PAGE: REGISTER
+     ============================ -->
+<div id="page-register" class="page">
+  <div class="auth-background"></div>
+  <div class="auth-container" style="max-width:520px">
+    <div class="auth-card">
+      <div class="auth-logo">
+        <div class="auth-logo-icon">🎓</div>
+        <h1 class="auth-title">Create Account</h1>
+        <p class="auth-subtitle">Join ExamPortal Pro today</p>
+      </div>
+
+      <div class="role-selector">
+        <button class="role-btn" data-role="student" id="reg-role-student">
+          <span class="role-icon">👩‍🎓</span> Student
+        </button>
+        <button class="role-btn" data-role="admin" id="reg-role-admin">
+          <span class="role-icon">👨‍💼</span> Admin
+        </button>
+      </div>
+
+      <form id="register-form">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Full Name *</label>
+            <input type="text" id="reg-fullname" class="form-control" placeholder="John Doe" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Username *</label>
+            <input type="text" id="reg-username" class="form-control" placeholder="john123" required />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email *</label>
+          <input type="email" id="reg-email" class="form-control" placeholder="john@example.com" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact Number</label>
+          <input type="tel" id="reg-contact" class="form-control" placeholder="+91 XXXXXXXXXX" />
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Password *</label>
+            <input type="password" id="reg-password" class="form-control" placeholder="Min 6 chars" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Confirm Password *</label>
+            <input type="password" id="reg-confirm" class="form-control" placeholder="Repeat password" required />
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full btn-lg">Create Account →</button>
+      </form>
+
+      <div class="auth-divider"><span class="auth-divider-text">Already have an account?</span></div>
+      <button id="btn-go-login" class="btn btn-secondary btn-full">Sign In Instead</button>
+      <div class="auth-link"><a id="btn-back-register">← Back to Home</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     PAGE: ADMIN DASHBOARD
+     ============================ -->
+<div id="page-admin-dashboard" class="page">
+  <div class="dashboard">
+
+    <!-- Sidebar -->
+    <aside class="sidebar" id="admin-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">🎓</div>
+        <div>
+          <div class="sidebar-brand">ExamPortal</div>
+          <div class="sidebar-brand-sub">Admin Panel</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Dashboard</div>
+        <a class="nav-item" data-section="admin-overview">
+          <span class="nav-icon">🏠</span> Overview
+        </a>
+
+        <div class="nav-section-label">Management</div>
+        <a class="nav-item" data-section="manage-students">
+          <span class="nav-icon">👥</span> Students
+        </a>
+        <a class="nav-item" data-section="manage-subjects">
+          <span class="nav-icon">📚</span> Subjects
+        </a>
+        <a class="nav-item" data-section="manage-questions">
+          <span class="nav-icon">❓</span> Questions
+        </a>
+        <a class="nav-item" data-section="manage-exams">
+          <span class="nav-icon">📋</span> Exams
+        </a>
+
+        <div class="nav-section-label">Data</div>
+        <a class="nav-item" data-section="view-registrations">
+          <span class="nav-icon">📝</span> Registrations
+        </a>
+        <a class="nav-item" data-section="view-results">
+          <span class="nav-icon">📊</span> Results
+        </a>
+      </nav>
+
+      <div class="sidebar-footer">
+        <div class="user-profile-mini">
+          <div class="user-avatar" id="admin-user-initials">AD</div>
+          <div>
+            <div class="user-name-mini" id="admin-user-name">Admin</div>
+            <div class="user-role-mini">Administrator</div>
+          </div>
+          <button class="logout-btn" onclick="logout()" title="Logout">⏼</button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- ===== OVERVIEW ===== -->
+      <div id="admin-overview" class="admin-section">
+        <div class="content-header">
+          <div class="content-header-left">
+            <h1 class="page-title">📊 Dashboard Overview</h1>
+            <p class="page-subtitle">Welcome back! Here's what's happening today.</p>
+          </div>
+          <div class="exam-timer" id="current-time-display">
+            <span>🕐</span> <span id="current-time">--:--</span>
+          </div>
+        </div>
+        <div class="content-body">
+          <div class="stats-grid">
+            <div class="stat-card purple animate-in">
+              <div class="stat-card-icon">👥</div>
+              <div class="stat-card-value" id="stat-students">0</div>
+              <div class="stat-card-label">Total Students</div>
+            </div>
+            <div class="stat-card cyan animate-in">
+              <div class="stat-card-icon">📋</div>
+              <div class="stat-card-value" id="stat-exams">0</div>
+              <div class="stat-card-label">Total Exams</div>
+            </div>
+            <div class="stat-card green animate-in">
+              <div class="stat-card-icon">❓</div>
+              <div class="stat-card-value" id="stat-questions">0</div>
+              <div class="stat-card-label">Questions</div>
+            </div>
+            <div class="stat-card amber animate-in">
+              <div class="stat-card-icon">📚</div>
+              <div class="stat-card-value" id="stat-subjects">0</div>
+              <div class="stat-card-label">Subjects</div>
+            </div>
+          </div>
+
+          <div class="grid-2" style="margin-bottom:24px">
+            <div class="card">
+              <div class="card-title">📈 Question Distribution by Subject</div>
+              <div class="mini-chart" id="overview-chart" style="height:80px"></div>
+            </div>
+            <div class="card">
+              <div class="card-title">⚡ Quick Actions</div>
+              <div style="display:flex;flex-direction:column;gap:10px">
+                <button class="btn btn-primary" onclick="loadAdminSection('manage-exams');setTimeout(openAddExam,100)">➕ Create New Exam</button>
+                <button class="btn btn-secondary" onclick="loadAdminSection('manage-questions');setTimeout(openAddQuestion,100)">➕ Add Question</button>
+                <button class="btn btn-secondary" onclick="loadAdminSection('manage-subjects');setTimeout(openAddSubject,100)">➕ Add Subject</button>
+                <button class="btn btn-secondary" onclick="loadAdminSection('view-results')">📊 View All Results</button>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-title flex justify-between items-center">
+              <span>🏆 Recent Results</span>
+              <button class="btn btn-sm btn-secondary" onclick="loadAdminSection('view-results')">View All</button>
+            </div>
+            <div class="table-container">
+              <table class="data-table">
+                <thead>
+                  <tr>
+                    <th>Student</th>
+                    <th>Exam</th>
+                    <th>Score</th>
+                    <th>Percentage</th>
+                    <th>Grade</th>
+                  </tr>
+                </thead>
+                <tbody id="recent-results-body">
+                  <tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:32px">Loading...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== STUDENTS ===== -->
+      <div id="manage-students" class="admin-section" style="display:none">
+        <div class="content-header">
+          <div class="content-header-left">
+            <h1 class="page-title">👥 Manage Students</h1>
+            <p class="page-subtitle">View and manage all enrolled students</p>
+          </div>
+          <div class="search-bar">
+            🔍 <input type="text" id="student-search" placeholder="Search students..." />
+          </div>
+        </div>
+        <div class="content-body">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Student ID</th>
+                  <th>Username</th>
+                  <th>Contact</th>
+                  <th>Registrations</th>
+                  <th>Avg Score</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="students-tbody">
+                <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:40px">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== SUBJECTS ===== -->
+      <div id="manage-subjects" class="admin-section" style="display:none">
+        <div class="content-header">
+          <div class="content-header-left">
+            <h1 class="page-title">📚 Manage Subjects</h1>
+            <p class="page-subtitle">Create and manage course subjects</p>
+          </div>
+          <button class="btn btn-primary" onclick="openAddSubject()">➕ Add Subject</button>
+        </div>
+        <div class="content-body">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Code</th>
+                  <th>Subject Name</th>
+                  <th>Department</th>
+                  <th>Semester</th>
+                  <th>Questions</th>
+                  <th>Exams</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="subjects-tbody">
+                <tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:40px">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== QUESTIONS ===== -->
+      <div id="manage-questions" class="admin-section" style="display:none">
+        <div class="content-header">
+          <div class="content-header-left">
+            <h1 class="page-title">❓ Question Bank</h1>
+            <p class="page-subtitle">Manage exam questions by subject</p>
+          </div>
+          <div class="flex gap-3">
+            <select id="q-filter-subject" class="form-control" style="width:auto">
+              <option value="">All Subjects</option>
+            </select>
+            <div class="search-bar">
+              🔍 <input type="text" id="q-search" placeholder="Search questions..." />
+            </div>
+            <button class="btn btn-primary" onclick="openAddQuestion()">➕ Add Question</button>
+          </div>
+        </div>
+        <div class="content-body">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>Question</th>
+                  <th>Subject</th>
+                  <th>Type</th>
+                  <th>Level</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="questions-tbody">
+                <tr><td colspan="6" style="text-align:center;color:var(--text-muted);padding:40px">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== EXAMS ===== -->
+      <div id="manage-exams" class="admin-section" style="display:none">
+        <div class="content-header">
+          <div class="content-header-left">
+            <h1 class="page-title">📋 Manage Exams</h1>
+            <p class="page-subtitle">Create and control examination schedules</p>
+          </div>
+          <button class="btn btn-primary" onclick="openAddExam()">➕ Create Exam</button>
+        </div>
+        <div class="content-body">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Exam Name</th>
+                  <th>Subject</th>
+                  <th>Date</th>
+                  <th>Time</th>
+                  <th>Duration</th>
+                  <th>Status</th>
+                  <th>Registrations</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="exams-tbody">
+                <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:40px">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== REGISTRATIONS ===== -->
+      <div id="view-registrations" class="admin-section" style="display:none">
+        <div class="content-header">
+          <div class="content-header-left">
+            <h1 class="page-title">📝 Registrations</h1>
+            <p class="page-subtitle">Student–Exam registration records</p>
+          </div>
+        </div>
+        <div class="content-body">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Exam</th>
+                  <th>Registered On</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="registrations-tbody">
+                <tr><td colspan="4" style="text-align:center;color:var(--text-muted);padding:40px">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ===== RESULTS ===== -->
+      <div id="view-results" class="admin-section" style="display:none">
+        <div class="content-header">
+          <div class="content-header-left">
+            <h1 class="page-title">📊 All Results</h1>
+            <p class="page-subtitle">Complete examination result records</p>
+          </div>
+        </div>
+        <div class="content-body">
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Student</th>
+                  <th>Exam</th>
+                  <th>Score</th>
+                  <th>Percentage</th>
+                  <th>Grade</th>
+                  <th>Status</th>
+                  <th>Time Taken</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="results-tbody">
+                <tr><td colspan="8" style="text-align:center;color:var(--text-muted);padding:40px">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============================
+     PAGE: STUDENT DASHBOARD
+     ============================ -->
+<div id="page-student-dashboard" class="page">
+  <div class="dashboard">
+
+    <aside class="sidebar" id="student-sidebar">
+      <div class="sidebar-header">
+        <div class="sidebar-logo">🎓</div>
+        <div>
+          <div class="sidebar-brand">ExamPortal</div>
+          <div class="sidebar-brand-sub">Student Portal</div>
+        </div>
+      </div>
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">My Dashboard</div>
+        <a class="nav-item" data-section="stu-overview">
+          <span class="nav-icon">🏠</span> Overview
+        </a>
+        <a class="nav-item" data-section="stu-exams">
+          <span class="nav-icon">📋</span> My Exams
+        </a>
+        <a class="nav-item" data-section="stu-results">
+          <span class="nav-icon">📊</span> My Results
+        </a>
+        <a class="nav-item" data-section="stu-profile">
+          <span class="nav-icon">👤</span> My Profile
+        </a>
+      </nav>
+      <div class="sidebar-footer">
+        <div class="user-profile-mini">
+          <div class="user-avatar" id="stu-user-initials">ST</div>
+          <div>
+            <div class="user-name-mini" id="stu-user-name">Student</div>
+            <div class="user-role-mini">Student</div>
+          </div>
+          <button class="logout-btn" onclick="logout()" title="Logout">⏼</button>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+
+      <!-- STUDENT OVERVIEW -->
+      <div id="stu-overview" class="student-section">
+        <div class="content-header">
+          <div class="content-header-left">
+            <h1 class="page-title">🏠 My Dashboard</h1>
+            <p class="page-subtitle">Track your progress and upcoming exams</p>
+          </div>
+        </div>
+        <div class="content-body">
+          <div class="stats-grid">
+            <div class="stat-card purple animate-in">
+              <div class="stat-card-icon">📋</div>
+              <div class="stat-card-value" id="stu-stat-registered">0</div>
+              <div class="stat-card-label">Registered Exams</div>
+            </div>
+            <div class="stat-card green animate-in">
+              <div class="stat-card-icon">✅</div>
+              <div class="stat-card-value" id="stu-stat-appeared">0</div>
+              <div class="stat-card-label">Exams Appeared</div>
+            </div>
+            <div class="stat-card amber animate-in">
+              <div class="stat-card-icon">⏳</div>
+              <div class="stat-card-value" id="stu-stat-pending">0</div>
+              <div class="stat-card-label">Pending Exams</div>
+            </div>
+            <div class="stat-card cyan animate-in">
+              <div class="stat-card-icon">📈</div>
+              <div class="stat-card-value" id="stu-stat-avg">-</div>
+              <div class="stat-card-label">Average Score</div>
+            </div>
+          </div>
+
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-title">📅 Available Exams</div>
+              <div id="stu-upcoming-list">
+                <div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">Loading...</div></div>
+              </div>
+            </div>
+            <div class="card">
+              <div class="card-title">🏆 Recent Results</div>
+              <div id="stu-recent-results">
+                <div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">Loading...</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STUDENT EXAMS -->
+      <div id="stu-exams" class="student-section" style="display:none">
+        <div class="content-header">
+          <div class="content-header-left">
+            <h1 class="page-title">📋 My Exams</h1>
+            <p class="page-subtitle">All your registered examinations</p>
+          </div>
+        </div>
+        <div class="content-body">
+          <div id="stu-exams-list">
+            <div class="empty-state"><div class="empty-icon">📋</div><div class="empty-title">Loading...</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STUDENT RESULTS -->
+      <div id="stu-results" class="student-section" style="display:none">
+        <div class="content-header">
+          <div class="content-header-left">
+            <h1 class="page-title">📊 My Results</h1>
+            <p class="page-subtitle">Your examination performance history</p>
+          </div>
+        </div>
+        <div class="content-body">
+          <div id="stu-results-list">
+            <div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">Loading...</div></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STUDENT PROFILE -->
+      <div id="stu-profile" class="student-section" style="display:none">
+        <div class="content-header">
+          <div class="content-header-left">
+            <h1 class="page-title">👤 My Profile</h1>
+            <p class="page-subtitle">Your account information</p>
+          </div>
+        </div>
+        <div class="content-body">
+          <div style="max-width:600px">
+            <div class="card" style="text-align:center;margin-bottom:24px;background:linear-gradient(135deg,rgba(108,99,255,0.1),rgba(6,182,212,0.1));border-color:rgba(108,99,255,0.3)">
+              <div class="user-avatar" id="profile-initials" style="width:80px;height:80px;font-size:32px;border-radius:20px;margin:0 auto 16px">ST</div>
+              <h2 id="profile-name" style="font-size:24px;font-weight:700;margin-bottom:4px">Student</h2>
+              <p id="profile-id" class="text-muted text-sm">ID: -</p>
+            </div>
+
+            <div class="card" style="margin-bottom:24px">
+              <div class="card-title">📋 Account Details</div>
+              <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px">
+                <div>
+                  <div class="text-sm text-muted" style="margin-bottom:4px">Username</div>
+                  <div style="font-weight:500" id="profile-username">-</div>
+                </div>
+                <div>
+                  <div class="text-sm text-muted" style="margin-bottom:4px">Email</div>
+                  <div style="font-weight:500" id="profile-email">-</div>
+                </div>
+                <div>
+                  <div class="text-sm text-muted" style="margin-bottom:4px">Contact</div>
+                  <div style="font-weight:500" id="profile-contact">-</div>
+                </div>
+                <div>
+                  <div class="text-sm text-muted" style="margin-bottom:4px">Joined On</div>
+                  <div style="font-weight:500" id="profile-joined">-</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-title">📊 Performance Summary</div>
+              <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;text-align:center">
+                <div style="padding:16px;background:var(--bg-surface);border-radius:var(--radius-sm)">
+                  <div style="font-size:28px;font-weight:800;color:var(--primary-light)" id="profile-exams-taken">0</div>
+                  <div class="text-sm text-muted">Exams Taken</div>
+                </div>
+                <div style="padding:16px;background:var(--bg-surface);border-radius:var(--radius-sm)">
+                  <div style="font-size:28px;font-weight:800;color:var(--success)" id="profile-exams-passed">0</div>
+                  <div class="text-sm text-muted">Exams Passed</div>
+                </div>
+                <div style="padding:16px;background:var(--bg-surface);border-radius:var(--radius-sm)">
+                  <div style="font-size:28px;font-weight:800;color:var(--secondary)" id="profile-avg-score">-</div>
+                  <div class="text-sm text-muted">Average Score</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ============================
+     PAGE: TAKE EXAM
+     ============================ -->
+<div id="page-take-exam" class="page">
+  <div style="min-height:100vh;background:var(--bg-dark)">
+
+    <!-- Exam Header -->
+    <div style="background:var(--bg-card);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;gap:16px;flex-wrap:wrap">
+      <div>
+        <div style="font-size:18px;font-weight:700" id="exam-title">Exam</div>
+        <div class="text-sm text-muted"><span id="exam-subject-label"></span> &bull; <span id="exam-qs-count">0</span> Questions &bull; <span id="exam-duration-label">--</span></div>
+      </div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <div class="exam-timer" id="exam-timer">
+          <span>⏱</span> <span id="timer-value">00:00</span>
+        </div>
+        <button class="btn btn-warning" id="btn-submit-exam-review">⏩ Submit Exam</button>
+      </div>
+    </div>
+
+    <!-- Exam Progress -->
+    <div style="padding:0 28px;background:var(--bg-card);border-bottom:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:16px;padding:12px 0">
+        <span class="text-sm text-muted">Q <span id="q-progress-current">1</span> of <span id="q-progress-total">0</span></span>
+        <div class="progress-bar" style="flex:1"><div class="progress-fill" id="q-progress-bar" style="width:0%"></div></div>
+      </div>
+    </div>
+
+    <!-- Instructions Banner -->
+    <div style="background:rgba(108,99,255,0.08);border-bottom:1px solid rgba(108,99,255,0.2);padding:10px 28px;font-size:13px;color:var(--primary-light)">
+      ℹ️ <span id="exam-instructions-text">Instructions will appear here</span>
+    </div>
+
+    <!-- Exam Body -->
+    <div style="padding:24px 28px">
+      <div class="exam-layout">
+        <div>
+          <div id="question-display">
+            <!-- Question rendered by JS -->
+          </div>
+          <div style="display:flex;gap:12px;justify-content:space-between;margin-top:8px">
+            <button id="btn-prev-q" class="btn btn-secondary">← Previous</button>
+            <button id="btn-next-q" class="btn btn-primary">Next →</button>
+          </div>
+        </div>
+
+        <!-- Exam Sidebar Panel -->
+        <div class="exam-sidebar-panel">
+          <div class="card" style="margin-bottom:16px">
+            <div class="card-title" style="font-size:14px">📋 Question Palette</div>
+            <div class="question-palette" id="question-palette"></div>
+            <div style="display:flex;gap:8px;flex-wrap:wrap;font-size:11px;margin-top:8px">
+              <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;border-radius:3px;background:rgba(16,185,129,0.2);border:1px solid var(--success);display:inline-block"></span>Answered</span>
+              <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;border-radius:3px;background:rgba(108,99,255,0.2);border:1px solid var(--primary);display:inline-block"></span>Current</span>
+              <span style="display:flex;align-items:center;gap:4px"><span style="width:14px;height:14px;border-radius:3px;background:var(--bg-surface);border:1px solid var(--border);display:inline-block"></span>Not Visited</span>
+            </div>
+          </div>
+          <div class="card" style="font-size:13px;color:var(--text-secondary);line-height:1.8">
+            <div class="card-title" style="font-size:14px">⚡ Tips</div>
+            <ul style="padding-left:16px">
+              <li>Select an option to mark your answer</li>
+              <li>Use palette to jump to any question</li>
+              <li>Submit before time runs out!</li>
+              <li>Auto-submits at 0:00</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     PAGE: RESULT
+     ============================ -->
+<div id="page-result" class="page">
+  <div style="min-height:100vh;background:var(--bg-dark)">
+
+    <!-- Result Header -->
+    <div style="background:var(--bg-card);border-bottom:1px solid var(--border);padding:16px 28px;display:flex;align-items:center;gap:16px">
+      <button id="btn-result-back" class="btn btn-secondary">← Back</button>
+      <div>
+        <div style="font-size:18px;font-weight:700">Exam Result</div>
+        <div class="text-sm text-muted" id="result-exam-name">Exam</div>
+      </div>
+    </div>
+
+    <div style="max-width:900px;margin:0 auto;padding:32px 24px">
+
+      <!-- Score Card -->
+      <div class="card" style="margin-bottom:24px;background:linear-gradient(135deg,var(--bg-card),rgba(108,99,255,0.05))">
+        <div class="result-hero">
+          <div class="result-score-ring" id="result-score-ring" style="--pct:0">
+            <div class="result-score-inner">
+              <div class="result-score-value" id="result-score-value">0%</div>
+              <div class="result-score-label">Score</div>
+            </div>
+          </div>
+          <div id="result-status-badge" style="margin-bottom:12px"></div>
+          <div style="font-size:22px;font-weight:700;margin-bottom:4px" id="result-grade">-</div>
+          <div class="text-sm text-muted">
+            <span id="result-student-name">Student</span> &bull; <span id="result-date">-</span>
+          </div>
+
+          <div class="result-stats" style="margin-top:28px">
+            <div class="result-stat">
+              <div class="result-stat-value" style="color:var(--success)" id="result-correct">0</div>
+              <div class="result-stat-label">✓ Correct</div>
+            </div>
+            <div class="result-stat">
+              <div class="result-stat-value" style="color:var(--danger)" id="result-wrong">0</div>
+              <div class="result-stat-label">✗ Wrong</div>
+            </div>
+            <div class="result-stat">
+              <div class="result-stat-value" style="color:var(--text-secondary)" id="result-total">0</div>
+              <div class="result-stat-label">Total</div>
+            </div>
+            <div class="result-stat">
+              <div class="result-stat-value" style="color:var(--secondary)" id="result-time">-</div>
+              <div class="result-stat-label">⏱ Time Taken</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Answer Review -->
+      <div class="card">
+        <div class="card-title" style="font-size:18px;margin-bottom:24px">🔍 Answer Review</div>
+        <div id="result-question-review">
+          <!-- Populated by JS -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     MODALS
+     ============================ -->
+
+<!-- Add Subject -->
+<div class="modal-overlay" id="modal-add-subject">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">📚 Add New Subject</div>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-add-subject">
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Subject Code *</label>
+            <input type="text" id="sub-code" class="form-control" placeholder="e.g. CS301" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Semester</label>
+            <input type="text" id="sub-sem" class="form-control" placeholder="e.g. 5th" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subject Name *</label>
+          <input type="text" id="sub-name" class="form-control" placeholder="Database Management System" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Department</label>
+          <input type="text" id="sub-dept" class="form-control" placeholder="Computer Science & Engineering" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Add Subject</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Subject -->
+<div class="modal-overlay" id="modal-edit-subject">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">✏️ Edit Subject</div>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-edit-subject">
+        <input type="hidden" id="edit-sub-id" />
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Subject Code</label>
+            <input type="text" id="edit-sub-code" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Semester</label>
+            <input type="text" id="edit-sub-sem" class="form-control" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subject Name</label>
+          <input type="text" id="edit-sub-name" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Department</label>
+          <input type="text" id="edit-sub-dept" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Save Changes</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Add Question -->
+<div class="modal-overlay" id="modal-add-question">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <div class="modal-title">❓ Add New Question</div>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-add-question">
+        <div class="form-group">
+          <label class="form-label">Subject *</label>
+          <select id="q-subject" class="form-control" required>
+            <option value="">-- Select Subject --</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Question Text *</label>
+          <textarea id="q-text" class="form-control" rows="3" placeholder="Enter your question..." required style="resize:vertical"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Question Type</label>
+            <select id="q-type" class="form-control">
+              <option value="MCQ">MCQ</option>
+              <option value="True/False">True/False</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Difficulty Level</label>
+            <select id="q-level" class="form-control">
+              <option value="easy">🟢 Easy</option>
+              <option value="medium">🟡 Medium</option>
+              <option value="hard">🔴 Hard</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+          <div class="form-group"><label class="form-label">Option A *</label><input id="q-opt-0" class="form-control" placeholder="Option A" required /></div>
+          <div class="form-group"><label class="form-label">Option B *</label><input id="q-opt-1" class="form-control" placeholder="Option B" required /></div>
+          <div class="form-group"><label class="form-label">Option C *</label><input id="q-opt-2" class="form-control" placeholder="Option C" required /></div>
+          <div class="form-group"><label class="form-label">Option D *</label><input id="q-opt-3" class="form-control" placeholder="Option D" required /></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Correct Option *</label>
+          <select id="q-correct" class="form-control" required>
+            <option value="0">A</option>
+            <option value="1">B</option>
+            <option value="2">C</option>
+            <option value="3">D</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Add Question</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Question -->
+<div class="modal-overlay" id="modal-edit-question">
+  <div class="modal" style="max-width:640px">
+    <div class="modal-header">
+      <div class="modal-title">✏️ Edit Question</div>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-edit-question">
+        <input type="hidden" id="edit-q-id" />
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <select id="edit-q-subject" class="form-control"></select>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Question Text</label>
+          <textarea id="edit-q-text" class="form-control" rows="3" style="resize:vertical"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Type</label>
+            <select id="edit-q-type" class="form-control"><option value="MCQ">MCQ</option><option value="True/False">True/False</option></select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Level</label>
+            <select id="edit-q-level" class="form-control">
+              <option value="easy">Easy</option><option value="medium">Medium</option><option value="hard">Hard</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+          <div class="form-group"><label class="form-label">Option A</label><input id="edit-q-opt-0" class="form-control" /></div>
+          <div class="form-group"><label class="form-label">Option B</label><input id="edit-q-opt-1" class="form-control" /></div>
+          <div class="form-group"><label class="form-label">Option C</label><input id="edit-q-opt-2" class="form-control" /></div>
+          <div class="form-group"><label class="form-label">Option D</label><input id="edit-q-opt-3" class="form-control" /></div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Correct Option</label>
+          <select id="edit-q-correct" class="form-control">
+            <option value="0">A</option><option value="1">B</option><option value="2">C</option><option value="3">D</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Save Changes</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Add Exam -->
+<div class="modal-overlay" id="modal-add-exam">
+  <div class="modal" style="max-width:600px">
+    <div class="modal-header">
+      <div class="modal-title">📋 Create New Exam</div>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-add-exam">
+        <div class="form-group">
+          <label class="form-label">Exam Name *</label>
+          <input type="text" id="exam-name" class="form-control" placeholder="e.g. DBMS Mid-Term Exam" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subject *</label>
+          <select id="exam-subject" class="form-control" required>
+            <option value="">-- Select Subject --</option>
+          </select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Exam Date *</label>
+            <input type="date" id="exam-date" class="form-control" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Exam Time</label>
+            <input type="time" id="exam-time" class="form-control" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Duration (minutes) *</label>
+            <input type="number" id="exam-duration" class="form-control" min="5" max="180" value="30" required />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select id="exam-status" class="form-control">
+              <option value="upcoming">Upcoming</option>
+              <option value="active" selected>Active</option>
+              <option value="completed">Completed</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Total Marks</label>
+            <input type="number" id="exam-total-marks" class="form-control" min="1" value="10" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Passing Marks</label>
+            <input type="number" id="exam-passing-marks" class="form-control" min="1" value="6" />
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Instructions</label>
+          <textarea id="exam-instructions" class="form-control" rows="2" placeholder="Special instructions for students..." style="resize:vertical"></textarea>
+        </div>
+        <div style="background:rgba(108,99,255,0.08);border:1px solid rgba(108,99,255,0.2);border-radius:var(--radius-sm);padding:12px;margin-bottom:16px;font-size:13px;color:var(--primary-light)">
+          ℹ️ Questions will be automatically selected from the chosen subject's question bank. All current students will be auto-registered.
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Create Exam</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Exam -->
+<div class="modal-overlay" id="modal-edit-exam">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">✏️ Edit Exam</div>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-edit-exam">
+        <input type="hidden" id="edit-exam-id" />
+        <div class="form-group">
+          <label class="form-label">Exam Name</label>
+          <input type="text" id="edit-exam-name" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Subject</label>
+          <select id="edit-exam-subject" class="form-control"></select>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Date</label>
+            <input type="date" id="edit-exam-date" class="form-control" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Time</label>
+            <input type="time" id="edit-exam-time" class="form-control" />
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label class="form-label">Duration (min)</label>
+            <input type="number" id="edit-exam-duration" class="form-control" min="5" max="180" />
+          </div>
+          <div class="form-group">
+            <label class="form-label">Status</label>
+            <select id="edit-exam-status" class="form-control">
+              <option value="upcoming">Upcoming</option>
+              <option value="active">Active</option>
+              <option value="completed">Completed</option>
+              <option value="cancelled">Cancelled</option>
+            </select>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Save Changes</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Student -->
+<div class="modal-overlay" id="modal-edit-student">
+  <div class="modal">
+    <div class="modal-header">
+      <div class="modal-title">✏️ Edit Student</div>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body">
+      <form id="form-edit-student">
+        <input type="hidden" id="edit-student-id" />
+        <div class="form-group">
+          <label class="form-label">Full Name</label>
+          <input type="text" id="edit-student-name" class="form-control" required />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Email</label>
+          <input type="email" id="edit-student-email" class="form-control" />
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contact</label>
+          <input type="tel" id="edit-student-contact" class="form-control" />
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Save Changes</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Submit Exam Confirmation -->
+<div class="modal-overlay" id="modal-submit-exam">
+  <div class="modal" style="max-width:420px">
+    <div class="modal-header">
+      <div class="modal-title">⚠️ Submit Exam?</div>
+      <button class="modal-close">✕</button>
+    </div>
+    <div class="modal-body" style="text-align:center">
+      <div style="font-size:64px;margin-bottom:16px">📤</div>
+      <h3 style="font-size:18px;font-weight:700;margin-bottom:12px">Ready to submit?</h3>
+      <div style="background:var(--bg-surface);border-radius:var(--radius-sm);padding:16px;margin-bottom:20px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:8px">
+          <span class="text-muted">✅ Answered:</span>
+          <span style="color:var(--success);font-weight:700" id="review-answered">0</span>
+        </div>
+        <div style="display:flex;justify-content:space-between">
+          <span class="text-muted">⭕ Skipped:</span>
+          <span style="color:var(--accent);font-weight:700" id="review-unanswered">0</span>
+        </div>
+      </div>
+      <p class="text-muted text-sm" style="margin-bottom:20px">Once submitted, you cannot change your answers.</p>
+      <div style="display:flex;gap:12px">
+        <button class="btn btn-secondary btn-full modal-close-btn" onclick="closeModal('modal-submit-exam')">← Review</button>
+        <button id="btn-confirm-submit" class="btn btn-success btn-full">✓ Submit Now</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ============================
+     SCRIPTS
+     ============================ -->
+<script src="db.js"></script>
+<script src="app.js"></script>
+<script>
+  // Quick Login from landing page
+  function quickLogin(username, password, role) {
+    const user = DB.Users.findByUsernameAndRole(username, role);
+    if (!user) { alert('User not found. Please seed by refreshing.'); return; }
+    let profile;
+    if (role === 'admin') profile = DB.Admins.findByUserId(user.id);
+    else profile = DB.Students.findByUserId(user.id);
+    DB.Session.set(user, profile);
+    if (role === 'admin') loadAdminDashboard();
+    else loadStudentDashboard();
+  }
+
+  // Live clock on admin overview
+  setInterval(() => {
+    const el = document.getElementById('current-time');
+    if (el) {
+      const now = new Date();
+      el.textContent = now.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+    }
+  }, 1000);
+</script>
+</body>
+</html>
