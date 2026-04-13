@@ -38,10 +38,7 @@ const DB = (() => {
       return null; // Not directly used in app.js for lookup anymore, handled via login
     },
     login: (username, password, role) => request('/login', 'POST', { username, password, role }),
-    findById: async (id) => {
-      const users = await request('/users'); // Need this endpoint? Or just filter
-      return users.find(u => u.id === id);
-    },
+    findById: (id) => request(`/users/${id}`),
     getAll: () => request('/users'),
   };
 
@@ -67,10 +64,7 @@ const DB = (() => {
       return all.find(a => a.userId === userId);
     },
     getAll: () => request('/admins'),
-    findById: async (id) => {
-      const all = await request('/admins');
-      return all.find(a => a.id === id);
-    },
+    findById: (id) => request(`/admins/${id}`),
   };
 
   // ---------- SUBJECTS ----------
@@ -79,10 +73,7 @@ const DB = (() => {
     update: (id, data) => request(`/subjects/${id}`, 'PUT', data),
     delete: (id) => request(`/subjects/${id}`, 'DELETE'),
     getAll: () => request('/subjects'),
-    findById: async (id) => {
-      const all = await request('/subjects');
-      return all.find(s => s.id === id);
-    },
+    findById: (id) => request(`/subjects/${id}`),
     findByCode: async (code) => {
       const all = await request('/subjects');
       return all.find(s => s.subjectCode === code);
@@ -96,10 +87,7 @@ const DB = (() => {
     update: (id, data) => request(`/questions/${id}`, 'PUT', data),
     delete: (id) => request(`/questions/${id}`, 'DELETE'),
     getAll: () => request('/questions'),
-    findById: async (id) => {
-      const all = await request('/questions');
-      return all.find(q => q.id === id);
-    },
+    findById: (id) => request(`/questions/${id}`),
     findBySubject: async (subjectId) => {
       const all = await request('/questions');
       return all.filter(q => q.subjectId === subjectId);
@@ -113,10 +101,7 @@ const DB = (() => {
     update: (id, data) => request(`/exams/${id}`, 'PUT', data),
     delete: (id) => request(`/exams/${id}`, 'DELETE'),
     getAll: () => request('/exams'),
-    findById: async (id) => {
-      const all = await request('/exams');
-      return all.find(e => e.id === id);
-    },
+    findById: (id) => request(`/exams/${id}`),
     findBySubject: async (subjectId) => {
       const all = await request('/exams');
       return all.filter(e => e.subjectId === subjectId);
@@ -157,10 +142,7 @@ const DB = (() => {
     create: (data) => request('/results', 'POST', data),
     update: (id, data) => request(`/results/${id}`, 'PUT', data),
     getAll: () => request('/results'),
-    findById: async (id) => {
-      const all = await request('/results');
-      return all.find(r => r.id === id);
-    },
+    findById: (id) => request(`/results/${id}`),
     findByStudent: async (studentId) => {
       const all = await request('/results');
       return all.filter(r => r.studentId === studentId);

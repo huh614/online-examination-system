@@ -82,6 +82,30 @@ app.post('/api/register', (req, res) => {
   }
 });
 
+app.get('/api/users', (req, res) => {
+  const users = db.prepare('SELECT id, username, role, email, createdAt FROM users').all();
+  res.json(users);
+});
+
+app.get('/api/users/:id', (req, res) => {
+  const user = db.prepare('SELECT id, username, role, email, createdAt FROM users WHERE id = ?').get(req.params.id);
+  res.json(user);
+});
+
+// =============================================
+// ADMIN ROUTES
+// =============================================
+
+app.get('/api/admins', (req, res) => {
+  const admins = db.prepare('SELECT * FROM admins').all();
+  res.json(admins);
+});
+
+app.get('/api/admins/:id', (req, res) => {
+  const admin = db.prepare('SELECT * FROM admins WHERE id = ?').get(req.params.id);
+  res.json(admin);
+});
+
 // =============================================
 // STUDENT ROUTES
 // =============================================
@@ -117,6 +141,11 @@ app.get('/api/subjects', (req, res) => {
   res.json(subjects);
 });
 
+app.get('/api/subjects/:id', (req, res) => {
+  const subject = db.prepare('SELECT * FROM subjects WHERE id = ?').get(req.params.id);
+  res.json(subject);
+});
+
 app.post('/api/subjects', (req, res) => {
   const id = getNextId('subjects', 'SUB');
   const { subjectCode, subjectName, department, semester } = req.body;
@@ -149,6 +178,12 @@ app.get('/api/questions', (req, res) => {
   res.json(questions);
 });
 
+app.get('/api/questions/:id', (req, res) => {
+  const q = db.prepare('SELECT * FROM questions WHERE id = ?').get(req.params.id);
+  if (q) q.options = JSON.parse(q.options);
+  res.json(q);
+});
+
 app.post('/api/questions', (req, res) => {
   const id = getNextId('questions', 'QUE');
   const { subjectId, text, options, correct, type, level } = req.body;
@@ -179,6 +214,12 @@ app.get('/api/exams', (req, res) => {
     questionIds: JSON.parse(e.questionIds)
   }));
   res.json(exams);
+});
+
+app.get('/api/exams/:id', (req, res) => {
+  const e = db.prepare('SELECT * FROM exams WHERE id = ?').get(req.params.id);
+  if (e) e.questionIds = JSON.parse(e.questionIds);
+  res.json(e);
 });
 
 app.post('/api/exams', (req, res) => {
@@ -228,6 +269,12 @@ app.get('/api/results', (req, res) => {
     answers: JSON.parse(r.answers)
   }));
   res.json(results);
+});
+
+app.get('/api/results/:id', (req, res) => {
+  const r = db.prepare('SELECT * FROM results WHERE id = ?').get(req.params.id);
+  if (r) r.answers = JSON.parse(r.answers);
+  res.json(r);
 });
 
 app.post('/api/results', (req, res) => {
