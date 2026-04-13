@@ -122,40 +122,32 @@ function initAuthPage(type) {
   document.querySelector(`#page-${page} .role-btn[data-role="student"]`)?.classList.add('active');
 }
 
-function handleLogin(e) {
+async function handleLogin(e) {
   e.preventDefault();
   const username = document.getElementById('login-username').value.trim();
   const password = document.getElementById('login-password').value.trim();
 
   if (!username || !password) { toast('Missing fields', 'Enter username and password', 'warning'); return; }
 
-  const user = DB.Users.findByUsernameAndRole(username, loginRole);
-  if (!user || user.password !== password) {
-    toast('Login Failed', 'Invalid credentials or wrong role selected', 'error');
-    return;
+  try {
+    const { user, profile } = await DB.Users.login(username, password, loginRole);
+    DB.Session.set(user, profile);
+
+    toast('Welcome back! 🎉', `Logged in as ${profile?.studentName || profile?.adminName || username}`, 'success');
+
+    setTimeout(() => {
+      if (loginRole === 'admin') {
+        loadAdminDashboard();
+      } else {
+        loadStudentDashboard();
+      }
+    }, 600);
+  } catch (err) {
+    toast('Login Failed', err.message || 'Invalid credentials or wrong role selected', 'error');
   }
-
-  let profile;
-  if (loginRole === 'admin') {
-    profile = DB.Admins.findByUserId(user.id);
-  } else {
-    profile = DB.Students.findByUserId(user.id);
-  }
-
-  DB.Session.set(user, profile);
-
-  toast('Welcome back! 🎉', `Logged in as ${profile?.studentName || profile?.adminName || username}`, 'success');
-
-  setTimeout(() => {
-    if (loginRole === 'admin') {
-      loadAdminDashboard();
-    } else {
-      loadStudentDashboard();
-    }
-  }, 600);
 }
 
-function handleRegister(e) {
+async function handleRegister(e) {
   e.preventDefault();
   const username = document.getElementById('reg-username').value.trim();
   const password = document.getElementById('reg-password').value.trim();
@@ -174,27 +166,26 @@ function handleRegister(e) {
     toast('Weak Password', 'Minimum 6 characters required', 'warning'); return;
   }
 
-  const existing = DB.Users.findByUsernameAndRole(username, registerRole);
-  if (existing) {
-    toast('Username Taken', 'Choose a different username', 'error'); return;
-  }
+  try {
+    const { user, profile } = await DB.Users.create({ username, password, role: registerRole, email, fullname, contact });
+    
+    if (registerRole === 'student') {
+      // Auto-register for active exams
+      const exams = await DB.Exams.getAll();
+      for (const ex of exams.filter(ex => ex.status === 'active' || ex.status === 'upcoming')) {
+        await DB.Registrations.create({ studentId: profile.id, examId: ex.id });
+      }
+    }
 
-  const user = DB.Users.create({ username, password, role: registerRole, email });
-
-  if (registerRole === 'student') {
-    const student = DB.Students.create({ userId: user.id, studentName: fullname, studentContact: contact, email });
-    // Auto-register for active exams
-    DB.Exams.getAll().filter(ex => ex.status === 'active' || ex.status === 'upcoming').forEach(ex => {
-      DB.Registrations.create({ studentId: student.id, examId: ex.id, registeredAt: new Date().toISOString() });
-    });
-    DB.Session.set(user, student);
+    DB.Session.set(user, profile);
     toast('Account Created! 🎉', 'Welcome to the system', 'success');
-    setTimeout(() => loadStudentDashboard(), 600);
-  } else {
-    const admin = DB.Admins.create({ userId: user.id, adminName: fullname, adminContact: contact });
-    DB.Session.set(user, admin);
-    toast('Admin Account Created! 🎉', 'Welcome, Admin!', 'success');
-    setTimeout(() => loadAdminDashboard(), 600);
+    
+    setTimeout(() => {
+      if (registerRole === 'admin') loadAdminDashboard();
+      else loadStudentDashboard();
+    }, 600);
+  } catch (err) {
+    toast('Registration Failed', err.message, 'error');
   }
 }
 
@@ -212,7 +203,7 @@ function logout() {
 // ADMIN DASHBOARD
 // =============================================
 
-function loadAdminDashboard() {
+async function loadAdminDashboard() {
   showPage('admin-dashboard');
   const session = DB.Session.get();
   if (!session) { showPage('login'); return; }
@@ -222,20 +213,20 @@ function loadAdminDashboard() {
   document.getElementById('admin-user-initials').textContent = getInitials(adminName);
 
   // Update stats
-  updateAdminStats();
+  await updateAdminStats();
 
   // Load default section
-  loadAdminSection('admin-overview');
+  await loadAdminSection('admin-overview');
 }
 
-function updateAdminStats() {
-  document.getElementById('stat-students').textContent = DB.Students.count();
-  document.getElementById('stat-exams').textContent    = DB.Exams.count();
-  document.getElementById('stat-questions').textContent = DB.Questions.count();
-  document.getElementById('stat-subjects').textContent = DB.Subjects.count();
+async function updateAdminStats() {
+  document.getElementById('stat-students').textContent = await DB.Students.count();
+  document.getElementById('stat-exams').textContent    = await DB.Exams.count();
+  document.getElementById('stat-questions').textContent = await DB.Questions.count();
+  document.getElementById('stat-subjects').textContent = await DB.Subjects.count();
 }
 
-function loadAdminSection(section) {
+async function loadAdminSection(section) {
   App.currentSection = section;
 
   // Update nav active state
@@ -252,31 +243,36 @@ function loadAdminSection(section) {
     secEl.style.display = 'block';
     // Populate data
     switch(section) {
-      case 'admin-overview':    renderAdminOverview(); break;
-      case 'manage-students':   renderStudentsTable(); break;
-      case 'manage-subjects':   renderSubjectsTable(); break;
-      case 'manage-questions':  renderQuestionsTable(); break;
-      case 'manage-exams':      renderExamsTable(); break;
-      case 'view-registrations': renderRegistrationsTable(); break;
-      case 'view-results':      renderResultsTable(); break;
+      case 'admin-overview':    await renderAdminOverview(); break;
+      case 'manage-students':   await renderStudentsTable(); break;
+      case 'manage-subjects':   await renderSubjectsTable(); break;
+      case 'manage-questions':  await renderQuestionsTable(); break;
+      case 'manage-exams':      await renderExamsTable(); break;
+      case 'view-registrations': await renderRegistrationsTable(); break;
+      case 'view-results':      await renderResultsTable(); break;
     }
   }
 }
 
 // --- OVERVIEW ---
-function renderAdminOverview() {
-  updateAdminStats();
+async function renderAdminOverview() {
+  await updateAdminStats();
 
   // Recent results
-  const results = DB.Results.getAll().slice(-5).reverse();
+  let results = await DB.Results.getAll();
+  results = results.slice(-5).reverse();
   const tbody = document.getElementById('recent-results-body');
   if (!results.length) {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:32px">No results yet</td></tr>`;
     return;
   }
+
+  const students = await DB.Students.getAll();
+  const exams = await DB.Exams.getAll();
+
   tbody.innerHTML = results.map(r => {
-    const student = DB.Students.findById(r.studentId);
-    const exam    = DB.Exams.findById(r.examId);
+    const student = students.find(s => s.id === r.studentId);
+    const exam    = exams.find(e => e.id === r.examId);
     const pct     = r.percentage;
     const grade   = getGradeLabel(pct);
     return `
@@ -296,16 +292,17 @@ function renderAdminOverview() {
   }).join('');
 
   // Active exams
-  const active = DB.Exams.findActive();
+  const active = await DB.Exams.findActive();
   const activeEl = document.getElementById('active-exams-count');
   if (activeEl) activeEl.textContent = active.length;
 
   // Chart bars
-  const subjects = DB.Subjects.getAll().slice(0, 6);
+  const subjects = (await DB.Subjects.getAll()).slice(0, 6);
   const chartEl = document.getElementById('overview-chart');
   if (chartEl && subjects.length) {
+    const questions = await DB.Questions.getAll();
     chartEl.innerHTML = subjects.map(sub => {
-      const qCount = DB.Questions.findBySubject(sub.id).length;
+      const qCount = questions.filter(q => q.subjectId === sub.id).length;
       const h = Math.max(10, Math.min(100, qCount * 8));
       return `<div class="chart-bar" style="height:${h}%" title="${sub.subjectName}: ${qCount} questions"></div>`;
     }).join('');
@@ -313,8 +310,8 @@ function renderAdminOverview() {
 }
 
 // --- STUDENTS TABLE ---
-function renderStudentsTable(search = '') {
-  let students = DB.Students.getAll();
+async function renderStudentsTable(search = '') {
+  let students = await DB.Students.getAll();
   if (search) students = students.filter(s =>
     s.studentName.toLowerCase().includes(search.toLowerCase()) ||
     s.email?.toLowerCase().includes(search.toLowerCase())
@@ -327,10 +324,14 @@ function renderStudentsTable(search = '') {
     return;
   }
 
+  const registrations = await DB.Registrations.getAll();
+  const resultsAll = await DB.Results.getAll();
+  const users = await DB.Users.getAll();
+
   tbody.innerHTML = students.map(s => {
-    const user = DB.Users.findById(s.userId);
-    const regCount = DB.Registrations.findByStudent(s.id).length;
-    const results  = DB.Results.findByStudent(s.id);
+    const user = users.find(u => u.id === s.userId);
+    const regCount = registrations.filter(r => r.studentId === s.id).length;
+    const results  = resultsAll.filter(r => r.studentId === s.id);
     const avgPct   = results.length ? Math.round(results.reduce((a,r) => a + r.percentage, 0) / results.length) : null;
     return `
       <tr>
@@ -359,8 +360,8 @@ function renderStudentsTable(search = '') {
   }).join('');
 }
 
-function editStudent(id) {
-  const s = DB.Students.findById(id);
+async function editStudent(id) {
+  const s = await DB.Students.findById(id);
   if (!s) return;
   document.getElementById('edit-student-id').value = id;
   document.getElementById('edit-student-name').value = s.studentName;
@@ -369,39 +370,43 @@ function editStudent(id) {
   openModal('modal-edit-student');
 }
 
-function saveEditStudent(e) {
+async function saveEditStudent(e) {
   e.preventDefault();
   const id = document.getElementById('edit-student-id').value;
   const name    = document.getElementById('edit-student-name').value.trim();
   const contact = document.getElementById('edit-student-contact').value.trim();
   const email   = document.getElementById('edit-student-email').value.trim();
-  DB.Students.update(id, { studentName: name, studentContact: contact, email });
+  await DB.Students.update(id, { studentName: name, studentContact: contact, email });
   toast('Student Updated', `${name}'s profile updated`, 'success');
   closeModal('modal-edit-student');
-  renderStudentsTable();
+  await renderStudentsTable();
 }
 
-function deleteStudent(id) {
-  const s = DB.Students.findById(id);
+async function deleteStudent(id) {
+  const s = await DB.Students.findById(id);
   if (confirm(`Delete student "${s?.studentName}"? This cannot be undone.`)) {
-    DB.Students.delete(id);
+    await DB.Students.delete(id);
     toast('Student Deleted', '', 'success');
-    renderStudentsTable();
-    updateAdminStats();
+    await renderStudentsTable();
+    await updateAdminStats();
   }
 }
 
 // --- SUBJECTS TABLE ---
-function renderSubjectsTable() {
-  const subjects = DB.Subjects.getAll();
+async function renderSubjectsTable() {
+  const subjects = await DB.Subjects.getAll();
   const tbody = document.getElementById('subjects-tbody');
   if (!subjects.length) {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:40px">No subjects yet</td></tr>`;
     return;
   }
+
+  const questions = await DB.Questions.getAll();
+  const exams = await DB.Exams.getAll();
+
   tbody.innerHTML = subjects.map(s => {
-    const qCount = DB.Questions.findBySubject(s.id).length;
-    const eCount = DB.Exams.findBySubject(s.id).length;
+    const qCount = questions.filter(q => q.subjectId === s.id).length;
+    const eCount = exams.filter(e => e.subjectId === s.id).length;
     return `
       <tr>
         <td><code style="color:var(--secondary);font-weight:600">${s.subjectCode}</code></td>
@@ -426,24 +431,24 @@ function openAddSubject() {
   openModal('modal-add-subject');
 }
 
-function saveNewSubject(e) {
+async function saveNewSubject(e) {
   e.preventDefault();
   const code = document.getElementById('sub-code').value.trim();
   const name = document.getElementById('sub-name').value.trim();
   const dept = document.getElementById('sub-dept').value.trim();
   const sem  = document.getElementById('sub-sem').value.trim();
   if (!code || !name) { toast('Missing fields', '', 'warning'); return; }
-  if (DB.Subjects.findByCode(code)) { toast('Code exists', 'Subject code already in use', 'error'); return; }
-  DB.Subjects.create({ subjectCode: code, subjectName: name, department: dept, semester: sem });
+  if (await DB.Subjects.findByCode(code)) { toast('Code exists', 'Subject code already in use', 'error'); return; }
+  await DB.Subjects.create({ subjectCode: code, subjectName: name, department: dept, semester: sem });
   toast('Subject Added', `${name} created`, 'success');
   closeModal('modal-add-subject');
-  renderSubjectsTable();
-  updateAdminStats();
-  refreshSubjectDropdowns();
+  await renderSubjectsTable();
+  await updateAdminStats();
+  await refreshSubjectDropdowns();
 }
 
-function editSubject(id) {
-  const s = DB.Subjects.findById(id);
+async function editSubject(id) {
+  const s = await DB.Subjects.findById(id);
   if (!s) return;
   document.getElementById('edit-sub-id').value = id;
   document.getElementById('edit-sub-code').value = s.subjectCode;
@@ -453,32 +458,32 @@ function editSubject(id) {
   openModal('modal-edit-subject');
 }
 
-function saveEditSubject(e) {
+async function saveEditSubject(e) {
   e.preventDefault();
   const id   = document.getElementById('edit-sub-id').value;
   const code = document.getElementById('edit-sub-code').value.trim();
   const name = document.getElementById('edit-sub-name').value.trim();
   const dept = document.getElementById('edit-sub-dept').value.trim();
   const sem  = document.getElementById('edit-sub-sem').value.trim();
-  DB.Subjects.update(id, { subjectCode: code, subjectName: name, department: dept, semester: sem });
+  await DB.Subjects.update(id, { subjectCode: code, subjectName: name, department: dept, semester: sem });
   toast('Subject Updated', '', 'success');
   closeModal('modal-edit-subject');
-  renderSubjectsTable();
-  refreshSubjectDropdowns();
+  await renderSubjectsTable();
+  await refreshSubjectDropdowns();
 }
 
-function deleteSubject(id) {
-  const s = DB.Subjects.findById(id);
+async function deleteSubject(id) {
+  const s = await DB.Subjects.findById(id);
   if (confirm(`Delete subject "${s?.subjectName}"?`)) {
-    DB.Subjects.delete(id);
+    await DB.Subjects.delete(id);
     toast('Subject Deleted', '', 'success');
-    renderSubjectsTable();
-    updateAdminStats();
+    await renderSubjectsTable();
+    await updateAdminStats();
   }
 }
 
-function refreshSubjectDropdowns() {
-  const subjects = DB.Subjects.getAll();
+async function refreshSubjectDropdowns() {
+  const subjects = await DB.Subjects.getAll();
   const opts = `<option value="">-- Select Subject --</option>` +
     subjects.map(s => `<option value="${s.id}">${s.subjectCode} - ${s.subjectName}</option>`).join('');
   ['q-subject', 'exam-subject', 'q-filter-subject'].forEach(id => {
@@ -488,8 +493,8 @@ function refreshSubjectDropdowns() {
 }
 
 // --- QUESTIONS TABLE ---
-function renderQuestionsTable(subjectFilter = '', search = '') {
-  let questions = DB.Questions.getAll();
+async function renderQuestionsTable(subjectFilter = '', search = '') {
+  let questions = await DB.Questions.getAll();
   if (subjectFilter) questions = questions.filter(q => q.subjectId === subjectFilter);
   if (search) questions = questions.filter(q => q.text.toLowerCase().includes(search.toLowerCase()));
 
@@ -500,9 +505,10 @@ function renderQuestionsTable(subjectFilter = '', search = '') {
   }
 
   const levelColors = { easy: 'badge-success', medium: 'badge-warning', hard: 'badge-danger' };
+  const subjects = await DB.Subjects.getAll();
 
   tbody.innerHTML = questions.map((q, i) => {
-    const subject = DB.Subjects.findById(q.subjectId);
+    const subject = subjects.find(s => s.id === q.subjectId);
     return `
       <tr>
         <td style="color:var(--text-muted);font-size:12px">${i + 1}</td>
@@ -524,13 +530,13 @@ function renderQuestionsTable(subjectFilter = '', search = '') {
   }).join('');
 }
 
-function openAddQuestion() {
+async function openAddQuestion() {
   document.getElementById('form-add-question').reset();
-  refreshSubjectDropdowns();
+  await refreshSubjectDropdowns();
   openModal('modal-add-question');
 }
 
-function saveNewQuestion(e) {
+async function saveNewQuestion(e) {
   e.preventDefault();
   const text      = document.getElementById('q-text').value.trim();
   const subjectId = document.getElementById('q-subject').value;
@@ -543,17 +549,17 @@ function saveNewQuestion(e) {
     toast('Missing fields', 'Fill all options and select subject', 'warning'); return;
   }
 
-  DB.Questions.create({ text, subjectId, type, level, correct, options });
+  await DB.Questions.create({ text, subjectId, type, level, correct, options });
   toast('Question Added', '', 'success');
   closeModal('modal-add-question');
-  renderQuestionsTable();
-  updateAdminStats();
+  await renderQuestionsTable();
+  await updateAdminStats();
 }
 
-function editQuestion(id) {
-  const q = DB.Questions.findById(id);
+async function editQuestion(id) {
+  const q = await DB.Questions.findById(id);
   if (!q) return;
-  refreshSubjectDropdowns();
+  await refreshSubjectDropdowns();
 
   document.getElementById('edit-q-id').value = id;
   document.getElementById('edit-q-text').value = q.text;
@@ -565,7 +571,7 @@ function editQuestion(id) {
   openModal('modal-edit-question');
 }
 
-function saveEditQuestion(e) {
+async function saveEditQuestion(e) {
   e.preventDefault();
   const id      = document.getElementById('edit-q-id').value;
   const text    = document.getElementById('edit-q-text').value.trim();
@@ -574,24 +580,24 @@ function saveEditQuestion(e) {
   const level   = document.getElementById('edit-q-level').value;
   const correct = parseInt(document.getElementById('edit-q-correct').value);
   const options = [0,1,2,3].map(i => document.getElementById(`edit-q-opt-${i}`).value.trim());
-  DB.Questions.update(id, { text, subjectId, type, level, correct, options });
+  await DB.Questions.update(id, { text, subjectId, type, level, correct, options });
   toast('Question Updated', '', 'success');
   closeModal('modal-edit-question');
-  renderQuestionsTable();
+  await renderQuestionsTable();
 }
 
-function deleteQuestion(id) {
+async function deleteQuestion(id) {
   if (confirm('Delete this question?')) {
-    DB.Questions.delete(id);
+    await DB.Questions.delete(id);
     toast('Question Deleted', '', 'success');
-    renderQuestionsTable();
-    updateAdminStats();
+    await renderQuestionsTable();
+    await updateAdminStats();
   }
 }
 
 // --- EXAMS TABLE ---
-function renderExamsTable() {
-  const exams = DB.Exams.getAll();
+async function renderExamsTable() {
+  const exams = await DB.Exams.getAll();
   const tbody = document.getElementById('exams-tbody');
   if (!exams.length) {
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:40px">No exams created yet</td></tr>`;
@@ -605,9 +611,12 @@ function renderExamsTable() {
     cancelled: 'badge-danger',
   };
 
+  const subjects = await DB.Subjects.getAll();
+  const registrations = await DB.Registrations.getAll();
+
   tbody.innerHTML = exams.map(ex => {
-    const subject = DB.Subjects.findById(ex.subjectId);
-    const regCount = DB.Registrations.findByExam(ex.id).length;
+    const subject = subjects.find(s => s.id === ex.subjectId);
+    const regCount = registrations.filter(r => r.examId === ex.id).length;
     return `
       <tr>
         <td style="font-weight:600">${ex.examName}</td>
@@ -629,13 +638,13 @@ function renderExamsTable() {
   }).join('');
 }
 
-function openAddExam() {
+async function openAddExam() {
   document.getElementById('form-add-exam').reset();
-  refreshSubjectDropdowns();
+  await refreshSubjectDropdowns();
   openModal('modal-add-exam');
 }
 
-function saveNewExam(e) {
+async function saveNewExam(e) {
   e.preventDefault();
   const name      = document.getElementById('exam-name').value.trim();
   const subjectId = document.getElementById('exam-subject').value;
@@ -652,12 +661,12 @@ function saveNewExam(e) {
   }
 
   // Pick questions from subject
-  const qPool = DB.Questions.findBySubject(subjectId);
+  const qPool = await DB.Questions.findBySubject(subjectId);
   const maxQ = Math.min(total, qPool.length);
   const selected = qPool.sort(() => Math.random() - 0.5).slice(0, maxQ);
   const session = DB.Session.get();
 
-  const exam = DB.Exams.create({
+  const exam = await DB.Exams.create({
     examName: name, subjectId, examDate: date, examTime: time,
     duration, totalMarks: total, passingMarks: passing,
     status, instructions, adminId: session?.user?.id,
@@ -665,20 +674,21 @@ function saveNewExam(e) {
   });
 
   // Register all students
-  DB.Students.getAll().forEach(s => {
-    DB.Registrations.create({ studentId: s.id, examId: exam.id, registeredAt: new Date().toISOString() });
-  });
+  const students = await DB.Students.getAll();
+  for (const s of students) {
+    await DB.Registrations.create({ studentId: s.id, examId: exam.id, registeredAt: new Date().toISOString() });
+  }
 
   toast('Exam Created', `${name} - ${selected.length} questions selected`, 'success');
   closeModal('modal-add-exam');
-  renderExamsTable();
-  updateAdminStats();
+  await renderExamsTable();
+  await updateAdminStats();
 }
 
-function editExam(id) {
-  const ex = DB.Exams.findById(id);
+async function editExam(id) {
+  const ex = await DB.Exams.findById(id);
   if (!ex) return;
-  refreshSubjectDropdowns();
+  await refreshSubjectDropdowns();
   document.getElementById('edit-exam-id').value = id;
   document.getElementById('edit-exam-name').value = ex.examName;
   document.getElementById('edit-exam-subject').value = ex.subjectId;
@@ -689,7 +699,7 @@ function editExam(id) {
   openModal('modal-edit-exam');
 }
 
-function saveEditExam(e) {
+async function saveEditExam(e) {
   e.preventDefault();
   const id   = document.getElementById('edit-exam-id').value;
   const name = document.getElementById('edit-exam-name').value.trim();
@@ -698,43 +708,48 @@ function saveEditExam(e) {
   const time = document.getElementById('edit-exam-time').value;
   const duration = parseInt(document.getElementById('edit-exam-duration').value);
   const status = document.getElementById('edit-exam-status').value;
-  DB.Exams.update(id, { examName: name, subjectId, examDate: date, examTime: time, duration, status });
+  await DB.Exams.update(id, { examName: name, subjectId, examDate: date, examTime: time, duration, status });
   toast('Exam Updated', '', 'success');
   closeModal('modal-edit-exam');
-  renderExamsTable();
+  await renderExamsTable();
 }
 
-function toggleExamStatus(id) {
-  const ex = DB.Exams.findById(id);
+async function toggleExamStatus(id) {
+  const ex = await DB.Exams.findById(id);
   if (!ex) return;
   const cycle = { upcoming: 'active', active: 'completed', completed: 'upcoming' };
   const newStatus = cycle[ex.status] || 'upcoming';
-  DB.Exams.update(id, { status: newStatus });
+  await DB.Exams.update(id, { status: newStatus });
   toast('Status Updated', `Exam is now "${newStatus}"`, 'success');
-  renderExamsTable();
+  await renderExamsTable();
 }
 
-function deleteExam(id) {
+async function deleteExam(id) {
   if (confirm('Delete this exam and all related registrations?')) {
-    DB.Exams.delete(id);
+    await DB.Exams.delete(id);
     toast('Exam Deleted', '', 'success');
-    renderExamsTable();
-    updateAdminStats();
+    await renderExamsTable();
+    await updateAdminStats();
   }
 }
 
 // --- REGISTRATIONS ---
-function renderRegistrationsTable() {
-  const regs = DB.Registrations.getAll();
+async function renderRegistrationsTable() {
+  const regs = await DB.Registrations.getAll();
   const tbody = document.getElementById('registrations-tbody');
   if (!regs.length) {
     tbody.innerHTML = `<tr><td colspan="5" style="text-align:center;color:var(--text-muted);padding:40px">No registrations</td></tr>`;
     return;
   }
+
+  const students = await DB.Students.getAll();
+  const exams = await DB.Exams.getAll();
+  const results = await DB.Results.getAll();
+
   tbody.innerHTML = regs.map(r => {
-    const student = DB.Students.findById(r.studentId);
-    const exam    = DB.Exams.findById(r.examId);
-    const result  = DB.Results.findByStudentAndExam(r.studentId, r.examId);
+    const student = students.find(s => s.id === r.studentId);
+    const exam    = exams.find(e => e.id === r.examId);
+    const result  = results.find(re => re.studentId === r.studentId && re.examId === r.examId);
     return `
       <tr>
         <td>${student?.studentName || 'Unknown'}</td>
@@ -751,16 +766,20 @@ function renderRegistrationsTable() {
 }
 
 // --- RESULTS ---
-function renderResultsTable() {
-  const results = DB.Results.getAll().reverse();
+async function renderResultsTable() {
+  const results = (await DB.Results.getAll()).reverse();
   const tbody = document.getElementById('results-tbody');
   if (!results.length) {
     tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;color:var(--text-muted);padding:40px">No results yet</td></tr>`;
     return;
   }
+
+  const students = await DB.Students.getAll();
+  const exams = await DB.Exams.getAll();
+
   tbody.innerHTML = results.map(r => {
-    const student = DB.Students.findById(r.studentId);
-    const exam    = DB.Exams.findById(r.examId);
+    const student = students.find(s => s.id === r.studentId);
+    const exam    = exams.find(e => e.id === r.examId);
     const grade   = getGradeLabel(r.percentage);
     return `
       <tr>
@@ -786,7 +805,7 @@ function renderResultsTable() {
 // STUDENT DASHBOARD
 // =============================================
 
-function loadStudentDashboard() {
+async function loadStudentDashboard() {
   showPage('student-dashboard');
   const session = DB.Session.get();
   if (!session) { showPage('login'); return; }
@@ -795,10 +814,10 @@ function loadStudentDashboard() {
   document.getElementById('stu-user-name').textContent = studentName;
   document.getElementById('stu-user-initials').textContent = getInitials(studentName);
 
-  loadStudentSection('stu-overview');
+  await loadStudentSection('stu-overview');
 }
 
-function loadStudentSection(section) {
+async function loadStudentSection(section) {
   App.currentSection = section;
 
   document.querySelectorAll('#student-sidebar .nav-item').forEach(item => {
@@ -811,21 +830,26 @@ function loadStudentSection(section) {
   if (secEl) {
     secEl.style.display = 'block';
     switch(section) {
-      case 'stu-overview':   renderStudentOverview(); break;
-      case 'stu-exams':      renderStudentExams(); break;
-      case 'stu-results':    renderStudentResults(); break;
-      case 'stu-profile':    renderStudentProfile(); break;
+      case 'stu-overview':   await renderStudentOverview(); break;
+      case 'stu-exams':      await renderStudentExams(); break;
+      case 'stu-results':    await renderStudentResults(); break;
+      case 'stu-profile':    await renderStudentProfile(); break;
     }
   }
 }
 
-function renderStudentOverview() {
+async function renderStudentOverview() {
   const session = DB.Session.get();
   const student = session.profile;
 
-  const regs = DB.Registrations.findByStudent(student.id);
-  const results = DB.Results.findByStudent(student.id);
-  const pending = regs.filter(r => !DB.Results.findByStudentAndExam(student.id, r.examId));
+  const regs = await DB.Registrations.findByStudent(student.id);
+  const results = await DB.Results.findByStudent(student.id);
+  
+  const pending = [];
+  for (const r of regs) {
+    const res = await DB.Results.findByStudentAndExam(student.id, r.examId);
+    if (!res) pending.push(r);
+  }
 
   document.getElementById('stu-stat-registered').textContent = regs.length;
   document.getElementById('stu-stat-appeared').textContent   = results.length;
@@ -842,8 +866,11 @@ function renderStudentOverview() {
 
   // Upcoming exams
   const upcomingEl = document.getElementById('stu-upcoming-list');
+  const exams = await DB.Exams.getAll();
+  const subjects = await DB.Subjects.getAll();
+
   const upcoming = regs
-    .map(r => DB.Exams.findById(r.examId))
+    .map(r => exams.find(e => e.id === r.examId))
     .filter(e => e && (e.status === 'active' || e.status === 'upcoming'))
     .slice(0, 3);
 
@@ -851,8 +878,8 @@ function renderStudentOverview() {
     upcomingEl.innerHTML = `<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-title">No upcoming exams</div></div>`;
   } else {
     upcomingEl.innerHTML = upcoming.map(ex => {
-      const sub = DB.Subjects.findById(ex.subjectId);
-      const hasResult = DB.Results.findByStudentAndExam(student.id, ex.id);
+      const sub = subjects.find(s => s.id === ex.subjectId);
+      const hasResult = results.some(r => r.examId === ex.id);
       return `
         <div class="card mb-4 animate-in" style="cursor:${hasResult ? 'default' : 'pointer'}" ${!hasResult ? `onclick="startExamFlow('${ex.id}')"` : ''}>
           <div class="flex items-center justify-between">
@@ -877,7 +904,7 @@ function renderStudentOverview() {
     recentResultsEl.innerHTML = `<div class="empty-state"><div class="empty-icon">📊</div><div class="empty-title">No results yet</div></div>`;
   } else {
     recentResultsEl.innerHTML = recentResults.map(r => {
-      const exam = DB.Exams.findById(r.examId);
+      const exam = exams.find(e => e.id === r.examId);
       const grade = getGradeLabel(r.percentage);
       return `
         <div class="card animate-in" style="margin-bottom:12px">
@@ -897,10 +924,10 @@ function renderStudentOverview() {
   }
 }
 
-function renderStudentExams() {
+async function renderStudentExams() {
   const session = DB.Session.get();
   const student = session.profile;
-  const regs = DB.Registrations.findByStudent(student.id);
+  const regs = await DB.Registrations.findByStudent(student.id);
   const container = document.getElementById('stu-exams-list');
 
   if (!regs.length) {
@@ -908,13 +935,17 @@ function renderStudentExams() {
     return;
   }
 
-  const exams = regs.map(r => DB.Exams.findById(r.examId)).filter(Boolean);
+  const examsAll = await DB.Exams.getAll();
+  const subjects = await DB.Subjects.getAll();
+  const resultsAll = await DB.Results.getAll();
+  
+  const exams = regs.map(r => examsAll.find(e => e.id === r.examId)).filter(Boolean);
 
   const statusColors = { upcoming: 'badge-secondary', active: 'badge-success', completed: 'badge-primary' };
 
   container.innerHTML = exams.map(ex => {
-    const sub    = DB.Subjects.findById(ex.subjectId);
-    const result = DB.Results.findByStudentAndExam(student.id, ex.id);
+    const sub    = subjects.find(s => s.id === ex.subjectId);
+    const result = resultsAll.find(r => r.studentId === student.id && r.examId === ex.id);
     const grade  = result ? getGradeLabel(result.percentage) : null;
     return `
       <div class="card animate-in" style="margin-bottom:16px">
@@ -951,10 +982,10 @@ function renderStudentExams() {
   }).join('');
 }
 
-function renderStudentResults() {
+async function renderStudentResults() {
   const session = DB.Session.get();
   const student = session.profile;
-  const results = DB.Results.findByStudent(student.id).reverse();
+  const results = (await DB.Results.findByStudent(student.id)).reverse();
   const container = document.getElementById('stu-results-list');
 
   if (!results.length) {
@@ -962,9 +993,12 @@ function renderStudentResults() {
     return;
   }
 
+  const exams = await DB.Exams.getAll();
+  const subjects = await DB.Subjects.getAll();
+
   container.innerHTML = results.map(r => {
-    const exam  = DB.Exams.findById(r.examId);
-    const sub   = DB.Subjects.findById(exam?.subjectId);
+    const exam  = exams.find(e => e.id === r.examId);
+    const sub   = subjects.find(s => s.id === exam?.subjectId);
     const grade = getGradeLabel(r.percentage);
     return `
       <div class="card animate-in" style="margin-bottom:16px;cursor:pointer" onclick="viewResultDetail('${r.id}')">
@@ -997,7 +1031,7 @@ function renderStudentResults() {
   }).join('');
 }
 
-function renderStudentProfile() {
+async function renderStudentProfile() {
   const session = DB.Session.get();
   const student = session.profile;
   const user    = session.user;
@@ -1010,7 +1044,7 @@ function renderStudentProfile() {
   document.getElementById('profile-contact').textContent = student.studentContact || '-';
   document.getElementById('profile-joined').textContent = formatDate(student.createdAt);
 
-  const results = DB.Results.findByStudent(student.id);
+  const results = await DB.Results.findByStudent(student.id);
   const passed  = results.filter(r => r.passed).length;
   document.getElementById('profile-exams-taken').textContent = results.length;
   document.getElementById('profile-exams-passed').textContent = passed;
@@ -1022,24 +1056,26 @@ function renderStudentProfile() {
 // EXAM TAKING ENGINE
 // =============================================
 
-function startExamFlow(examId) {
+async function startExamFlow(examId) {
   const session = DB.Session.get();
   const student = session.profile;
-  const exam    = DB.Exams.findById(examId);
+  const exam    = await DB.Exams.findById(examId);
 
   if (!exam) { toast('Exam not found', '', 'error'); return; }
   if (exam.status !== 'active') { toast('Exam not available', 'This exam is not currently active', 'warning'); return; }
 
-  const already = DB.Results.findByStudentAndExam(student.id, examId);
+  const already = await DB.Results.findByStudentAndExam(student.id, examId);
   if (already) { toast('Already attempted', 'You have already submitted this exam', 'warning'); return; }
 
   // Build question list
-  const questions = (exam.questionIds || []).map(qid => DB.Questions.findById(qid)).filter(Boolean);
+  const allQ = await DB.Questions.getAll();
+  const questions = (exam.questionIds || []).map(qid => allQ.find(q => q.id === qid)).filter(Boolean);
   if (!questions.length) { toast('No questions', 'This exam has no questions assigned', 'error'); return; }
 
   // Populate exam UI
   document.getElementById('exam-title').textContent = exam.examName;
-  document.getElementById('exam-subject-label').textContent = DB.Subjects.findById(exam.subjectId)?.subjectName || '';
+  const sub = await DB.Subjects.findById(exam.subjectId);
+  document.getElementById('exam-subject-label').textContent = sub?.subjectName || '';
   document.getElementById('exam-qs-count').textContent = questions.length;
   document.getElementById('exam-duration-label').textContent = `${exam.duration} min`;
   document.getElementById('exam-instructions-text').textContent = exam.instructions || 'No special instructions.';
@@ -1161,14 +1197,14 @@ function reviewAndSubmit() {
   openModal('modal-submit-exam');
 }
 
-function submitExam() {
+async function submitExam() {
   closeModal('modal-submit-exam');
   clearInterval(App.examState.timerInterval);
 
   const { examId, questions, answers, startTime, totalMarks, passingMarks } = App.examState;
   const session  = DB.Session.get();
   const student  = session.profile;
-  const exam     = DB.Exams.findById(examId);
+  const exam     = await DB.Exams.findById(examId);
 
   // Calculate score
   let score = 0;
@@ -1185,7 +1221,7 @@ function submitExam() {
   const timeTakenMs = Date.now() - startTime;
   const timeTaken   = Math.round(timeTakenMs / 60000); // minutes
 
-  const result = DB.Results.create({
+  const result = await DB.Results.create({
     studentId: student.id,
     examId,
     score,
@@ -1229,12 +1265,12 @@ function startTimer() {
 // RESULT DETAIL
 // =============================================
 
-function showResultPage(resultId, questionsOverride = null, answersOverride = null) {
-  const result    = DB.Results.findById(resultId);
+async function showResultPage(resultId, questionsOverride = null, answersOverride = null) {
+  const result    = await DB.Results.findById(resultId);
   if (!result) return;
 
-  const exam      = DB.Exams.findById(result.examId);
-  const student   = DB.Students.findById(result.studentId);
+  const exam      = await DB.Exams.findById(result.examId);
+  const student   = await DB.Students.findById(result.studentId);
   const grade     = getGradeLabel(result.percentage);
 
   // Populate result UI
@@ -1258,7 +1294,11 @@ function showResultPage(resultId, questionsOverride = null, answersOverride = nu
     : `<span class="badge badge-danger" style="font-size:16px;padding:8px 20px">✗ FAILED</span>`;
 
   // Question review
-  const questions = questionsOverride || (exam?.questionIds || []).map(qid => DB.Questions.findById(qid)).filter(Boolean);
+  let questions = questionsOverride;
+  if (!questions) {
+    const allQ = await DB.Questions.getAll();
+    questions = (exam?.questionIds || []).map(qid => allQ.find(q => q.id === qid)).filter(Boolean);
+  }
   const detailedAnswers = answersOverride || result.answers || {};
 
   const reviewEl = document.getElementById('result-question-review');
@@ -1297,8 +1337,8 @@ function showResultPage(resultId, questionsOverride = null, answersOverride = nu
   showPage('result');
 }
 
-function viewResultDetail(resultId) {
-  showResultPage(resultId);
+async function viewResultDetail(resultId) {
+  await showResultPage(resultId);
 }
 
 function goBackFromResult() {
@@ -1317,15 +1357,15 @@ function goBackFromResult() {
 // INIT
 // =============================================
 
-document.addEventListener('DOMContentLoaded', () => {
-  // Seed DB
-  DB.seed();
+document.addEventListener('DOMContentLoaded', async () => {
+  // Seed DB (Backend handles it, but we can call it if needed)
+  await DB.seed();
 
   // Check existing session
   const session = DB.Session.get();
   if (session) {
-    if (session.user.role === 'admin') loadAdminDashboard();
-    else loadStudentDashboard();
+    if (session.user.role === 'admin') await loadAdminDashboard();
+    else await loadStudentDashboard();
   } else {
     showPage('landing');
   }
@@ -1400,5 +1440,5 @@ document.addEventListener('DOMContentLoaded', () => {
   document.getElementById('btn-result-back')?.addEventListener('click', goBackFromResult);
 
   // Refresh subject dropdowns on load
-  refreshSubjectDropdowns();
+  await refreshSubjectDropdowns();
 });

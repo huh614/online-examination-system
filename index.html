@@ -1283,15 +1283,15 @@
 <script src="app.js"></script>
 <script>
   // Quick Login from landing page
-  function quickLogin(username, password, role) {
-    const user = DB.Users.findByUsernameAndRole(username, role);
+  async function quickLogin(username, password, role) {
+    const user = await DB.Users.findByUsernameAndRole(username, role);
     if (!user) { alert('User not found. Please seed by refreshing.'); return; }
     let profile;
-    if (role === 'admin') profile = DB.Admins.findByUserId(user.id);
-    else profile = DB.Students.findByUserId(user.id);
+    if (role === 'admin') profile = await DB.Admins.findByUserId(user.id);
+    else profile = await DB.Students.findByUserId(user.id);
     DB.Session.set(user, profile);
-    if (role === 'admin') loadAdminDashboard();
-    else loadStudentDashboard();
+    if (role === 'admin') await loadAdminDashboard();
+    else await loadStudentDashboard();
   }
 
   // Live clock on admin overview

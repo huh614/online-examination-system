@@ -1,0 +1,4 @@
+node_modules/
+exam_system.db
+.env
+.DS_Store
